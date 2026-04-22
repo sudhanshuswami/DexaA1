@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MemberGPT — Kalos Coach</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+<link rel="stylesheet" href="/static/style.css" />
+<script src="/static/chart.umd.min.js"></script>
+<script src="/static/kalos.js"></script>
+<style>
+</style>
+</head>
+<body data-page="coach">
+
+<nav class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Kalos</div>
+    <div class="topbar-tag">MemberGPT — Coach Interface</div>
+  </div>
+ 
+  <a href="/dbviewer" class="coach-link">DBViewer →</a>
+  <button class="hamburger-btn" id="sidebar-toggle"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar: member list -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Members</div>
+    </div>
+    <div class="member-list" id="member-list">
+      <div style="padding:20px;color:var(--muted);font-size:0.85rem">Loading members…</div>
+    </div>
+    <div class="sidebar-separator">Session</div>
+    <button class="new-chat-btn" onclick="newChat()">+ New Conversation</button>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <div class="chat-header-title" id="chat-title">Ask anything about your members</div>
+      <div class="chat-header-sub" id="chat-sub">Powered by Gemini · Grounded in real DEXA scan data</div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome-state">
+        <h2>Hey Coach,<br/>ask me <em>anything.</em></h2>
+        <p>I have access to all member DEXA scan data. Ask about trends, comparisons, coaching recommendations, and more.</p>
+        <div class="suggestions">
+          <button class="suggestion" onclick="sendSuggestion(this.dataset.q)" data-q="How has Maya's body fat percentage trended over the last year?">
+            How has Maya's body fat percentage trended?
+            <span>Trend analysis for a specific member</span>
+          </button>
+          <button class="suggestion" onclick="sendSuggestion(this.dataset.q)" data-q="Which members have lost lean mass between their last two scans?">
+            Which members have lost lean mass between their last two scans?
+            <span>Cross-member comparison</span>
+          </button>
+          <button class="suggestion" onclick="sendSuggestion(this.dataset.q)" data-q="How many members have had 3 or more scans?">
+            How many members have had 3 or more scans?
+            <span>Database query</span>
+          </button>
+          <button class="suggestion" onclick="sendSuggestion(this.dataset.q)" data-q="What should I focus on in my next coaching session with Jordan?">
+            What should I focus on in my next session with Jordan?
+            <span>AI coaching recommendation</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <div class="template-bar">
+          <select class="template-select" id="question-template" onchange="Kalos.Coach.applyTemplate(this.value)"></select>
+        </div>
+        <textarea class="input-box" id="input-box" placeholder="Ask about any member's body composition, trends, or coaching focus…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+        <button class="stop-btn" id="stop-btn" onclick="Kalos.Coach.stopStreaming()">■</button>
+      </div>
+      <div class="input-hint">All answers are grounded in real DEXA scan data. Shift+Enter for new line.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

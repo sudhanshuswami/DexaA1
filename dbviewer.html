@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalos DB Viewer</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+<link rel="stylesheet" href="/static/style.css" />
+<script src="/static/chart.umd.min.js"></script>
+<script src="/static/kalos.js"></script>
+<style> 
+</style>
+</head>
+<body data-page="dbviewer">
+
+<div class="topbar">
+  <div class="logo">Kalos <span>/ DB Viewer &amp; Editor</span></div>
+  <div class="tb-right">
+    <div class="toggle-wrap">
+      <label class="toggle">
+        <input type="checkbox" id="auto-refresh" checked onchange="toggleAR(this.checked)"/>
+        <span class="slider"></span>
+      </label>Auto-refresh
+    </div>
+    <button class="btn btn-primary" onclick="doRefresh()">↻ Refresh</button>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑 Reset DB</button>
+    <a href="/" class="nav-link">Dashboard</a>
+    <a href="/coach" class="nav-link">MemberGPT</a>
+  </div>
+</div>
+
+<main>
+  <div class="status-bar">
+    <div class="dot" id="sdot"></div>
+    <div class="status-text" id="stext">Connecting…</div>
+    <div class="last-upd" id="lupd">—</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Members</div><div class="stat-val" id="s-m">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Scans</div><div class="stat-val" id="s-s">—</div></div>
+    <div class="stat-card"><div class="stat-label">Latest Added</div><div class="stat-val" id="s-l" style="font-size:.85rem;padding-top:6px">—</div></div>
+    <div class="stat-card"><div class="stat-label">Edit Status</div><div class="stat-val" id="s-e" style="font-size:.78rem;padding-top:6px;color:var(--success)">Click any cell to edit</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('scans',this)">Scans</button>
+    <button class="tab" onclick="switchTab('members',this)">Members</button>
+  </div>
+
+  <div id="tab-scans"><div class="loading">Loading…</div></div>
+  <div id="tab-members" style="display:none"><div class="loading">Loading…</div></div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <div class="log-title">Activity Log</div>
+      <button class="btn btn-ghost" onclick="clearLog()" style="font-size:.74rem;padding:3px 9px;">Clear</button>
+    </div>
+    <div class="log-box" id="log-box">
+      <div class="log-line"><span class="log-ts">boot</span><span class="log-msg">DB Viewer ready — click any highlighted cell to edit inline.</span></div>
+    </div>
+  </div>
+</main>
+
+<div id="toast"></div>
+</body>
+</html>

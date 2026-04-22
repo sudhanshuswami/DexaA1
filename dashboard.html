@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalos — Member Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+<link rel="stylesheet" href="/static/style.css" />
+
+<script src="/static/chart.umd.min.js"></script>
+<script src="/static/kalos.js"></script>
+</head>
+<body data-page="dashboard">
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card fade-in">
+    <div class="auth-logo">Kalos</div>
+    <div class="auth-sub">Body composition intelligence</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@kalos.com" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="demo-accounts">
+      <p>Demo Accounts (password: demo123)</p>
+      <div class="demo-row"><span>sarah@kalos.com</span><span>1 scan</span></div>
+      <div class="demo-row"><span>jordan@kalos.com</span><span>2 scans</span></div>
+      <div class="demo-row"><span>alex@kalos.com</span><span>3 scans</span></div>
+      <div class="demo-row"><span>maya@kalos.com</span><span>5 scans</span></div>
+      <div class="demo-row"><span>chris@kalos.com</span><span>4 scans</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none; flex-direction:column; min-height:100vh;">
+  <nav class="topbar">
+    <div class="topbar-logo">Kalos</div>
+    <div class="topbar-right">
+      <span class="member-name" id="nav-name"></span>
+   
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+  <main id="main-content">
+    <div class="spinner"><div class="spin"></div></div>
+  </main>
+</div>
+
+<input type="file" id="file-input" accept=".pdf,application/pdf" onchange="handleFileSelect(event)" />
+</body>
+</html>

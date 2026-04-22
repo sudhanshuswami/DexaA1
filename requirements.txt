@@ -1,0 +1,29 @@
+# ─────────────────────────────────────────────
+#  Kalos Backend — Python Dependencies
+#  Python 3.11+ recommended
+# ─────────────────────────────────────────────
+
+# Web framework
+fastapi==0.115.0
+
+# ASGI server (standard extras add websocket + fast reload support)
+uvicorn[standard]==0.30.6
+
+# File upload support (required by FastAPI for UploadFile)
+python-multipart==0.0.12
+
+# Data validation (FastAPI depends on this)
+pydantic==2.9.2
+
+# Google Gemini AI — PDF extraction + chat
+google-generativeai==0.8.3
+
+# .env file loading (load GEMINI_API_KEY from .env file)
+python-dotenv==1.0.1
+
+# ─────────────────────────────────────────────
+#  Standard library modules used (no install needed):
+#  sqlite3, hashlib, secrets, os, sys, json,
+#  re, base64, logging, datetime, pathlib,
+#  contextlib, typing
+# ─────────────────────────────────────────────
