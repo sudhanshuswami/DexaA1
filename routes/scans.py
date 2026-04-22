@@ -226,6 +226,23 @@ async def upload_scan(
     log.info(f"✅ Scan saved — scan_id={scan['id']} member_id={member_id} date={scan['scan_date']}")
     return scan
 
+def _classify_gemini_error(e: Exception) -> str:
+    """Return a short user-friendly error message for Gemini failures."""
+    msg = str(e)
+    if "429" in msg or "quota" in msg.lower() or "rate" in msg.lower():
+        retry = re.search(r"retry in ([\d.]+)s", msg)
+        wait  = f" Retry in ~{int(float(retry.group(1)))}s." if retry else ""
+        log.warning(f"Gemini rate limit hit (scans): {msg[:200]}")
+        return f"Rate limit reached — free Gemini API allows 20 requests/day.{wait}"
+    if "403" in msg or "api key" in msg.lower():
+        log.error(f"Gemini auth error (scans): {msg[:200]}")
+        return "API key error — check GEMINI_API_KEY on server."
+    if "timeout" in msg.lower():
+        log.error(f"Gemini timeout (scans): {msg[:200]}")
+        return "Request timed out — PDF may be too large or complex."
+    log.error(f"Gemini error ({type(e).__name__}): {msg[:400]}")
+    return f"AI extraction failed ({type(e).__name__}) — try manual entry."
+
 async def _extract_with_gemini(pdf_bytes: bytes) -> Optional[dict]:
     try:
         model = _gemini_model()
@@ -251,8 +268,9 @@ async def _extract_with_gemini(pdf_bytes: bytes) -> Optional[dict]:
         except: pass
         return None
     except Exception as e:
-        log.error(f"Gemini error: {type(e).__name__}: {e}")
-        return None
+        friendly = _classify_gemini_error(e)
+        # Store friendly message to re-raise as HTTP error
+        raise HTTPException(status_code=503, detail=friendly)
 
 # ── Manual scan entry (fallback when PDF extraction fails) ──────
 

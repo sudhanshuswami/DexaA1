@@ -138,6 +138,26 @@ async def chat(req: ChatRequest):
     chat_session = model.start_chat(history=history)
     full_response = []
 
+    def _friendly_error(e: Exception) -> str:
+        import re as _re
+        msg = str(e)
+        if "429" in msg or "quota" in msg.lower() or "rate" in msg.lower():
+            retry = _re.search(r"retry in ([\d.]+)s", msg)
+            wait = f" Please wait ~{int(float(retry.group(1)))}s and try again." if retry else " Please wait a moment and try again."
+            log.warning(f"Gemini rate limit: {msg[:200]}")
+            return f"\u23f3 **Rate limit reached** — the free Gemini API allows 20 requests/day.{wait}"
+        if "403" in msg or "api key" in msg.lower() or "permission" in msg.lower():
+            log.error(f"Gemini auth error: {msg[:200]}")
+            return "\U0001f511 **API key error** — GEMINI_API_KEY may be invalid. Check server config."
+        if "500" in msg or "internal" in msg.lower():
+            log.error(f"Gemini server error: {msg[:200]}")
+            return "\U0001f534 **Gemini server error** — Google returned an error. Try again shortly."
+        if "timeout" in msg.lower() or "deadline" in msg.lower():
+            log.error(f"Gemini timeout: {msg[:200]}")
+            return "\u23f1\ufe0f **Request timed out** — try a shorter question."
+        log.error(f"Gemini error ({type(e).__name__}): {msg[:400]}")
+        return f"\u274c **AI error** — {type(e).__name__}. Check server logs for details."
+
     def generate():
         try:
             response = chat_session.send_message(req.message, stream=True)
@@ -149,7 +169,7 @@ async def chat(req: ChatRequest):
             log_gemini_response(log, assembled, label=f"session={req.session_id}")
             log.info(f"Response: {len(assembled)} chars streamed")
         except Exception as e:
-            log.error(f"Gemini streaming error: {type(e).__name__}: {e}")
-            yield f"\n\n[Error communicating with AI: {str(e)}]"
+            friendly = _friendly_error(e)
+            yield f"\n\n{friendly}"
 
     return StreamingResponse(generate(), media_type="text/plain")
