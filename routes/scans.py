@@ -6,6 +6,8 @@ from logger import get_logger, log_db_event, log_gemini_prompt, log_gemini_respo
 from typing import Optional
 import os, json, re, base64
 import google.generativeai as genai
+from fastapi import Form
+
 
 log = get_logger("scans")
 router = APIRouter()
@@ -52,7 +54,7 @@ def _gemini_model():
     if not GEMINI_KEY:
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set on server.")
     genai.configure(api_key=GEMINI_KEY)
-    return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.GenerativeModel("gemini-3.1-flash-lite-preview")
 
 def _save_scan(conn, member_id: int, extracted: dict) -> dict:
     """Insert a scan record and return it."""
@@ -156,7 +158,7 @@ def member_summary(member_id: int):
 async def upload_scan(
     request: Request,
     file: UploadFile = File(...),
-    scan_date_override: Optional[str] = None
+    scan_date_override: Optional[str] = Form(None)
 ):
     member_id = get_current_member(request)
     log_section(log, f"PDF UPLOAD — member_id={member_id}")
